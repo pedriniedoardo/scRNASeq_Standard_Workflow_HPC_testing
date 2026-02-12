@@ -1,0 +1,15 @@
+name: env_bioinfo_minimal
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - python=3.13.2
+  - multiqc=1.27.1
+  - samtools=1.21
+  - htslib=1.21
+  - numpy=2.2.4
+  - plotly=6.0.1
+  - python-kaleido=0.2.1
+  - pyaml-env=1.2.2

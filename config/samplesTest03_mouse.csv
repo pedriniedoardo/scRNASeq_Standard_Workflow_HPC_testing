@@ -1,0 +1,9 @@
+sample_name,sample_run,sample_path
+5k_mouse_brain_CNIK_3pv3,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_nuclei_brain/5k_mouse_brain_CNIK_3pv3
+1k_mouse_kidney_CNIK_3pv3,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_nuclei_kidney/1k_mouse_kidney_CNIK_3pv3
+5k_mouse_lung_CNIK_3pv3,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_nuclei_lung/5k_mouse_lung_CNIK_3pv3
+5k_mouse_heart_CNIK_3pv3,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_nuclei_heart/5k_mouse_heart_CNIK_3pv3
+5k_mouse_liver_CNIK_3pv3,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_nuclei_liver/5k_mouse_liver_CNIK_3pv3
+heart_1k_v2,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_cell_heart/heart_1k_v2
+SC3_v3_NextGem_DI_Neurons_5K_gex,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_cell_brain/SC3_v3_NextGem_DI_Neurons_5K/SC3_v3_NextGem_DI_Neurons_5K_gex
+SC3_v3_NextGem_DI_CellPlex_Mouse_PBMC_10K_1_gex,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/mouse_cell_pbmc/SC3_v3_NextGem_DI_CellPlex_Mouse_PBMC_10K/SC3_v3_NextGem_DI_CellPlex_Mouse_PBMC_10K_1_gex

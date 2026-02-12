@@ -1,0 +1,6 @@
+sample_name,sample_run,sample_path
+5k_human_jejunum_CNIK_3pv3,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/human_nuclei_jejunum/5k_human_jejunum_CNIK_3pv3
+5k_Human_Donor1_PBMC_3p_gem-x_GEX,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/human_cell_pbmc/5k_Human_Donor1_PBMC_3p_gem-x_GEX
+SC3_v3_NextGem_DI_CRISPR_A549_5K_gex,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/human_cell_lung/SC3_v3_NextGem_DI_CRISPR_A549_5K/SC3_v3_NextGem_DI_CRISPR_A549_5K_gex
+Brain_Tumor_3p,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/human_cell_brain/Brain_Tumor_3p
+Breast_Cancer_3p,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/test_CR_intronic/human_cell_breast/Breast_Cancer_3p

@@ -1,0 +1,11 @@
+name: cellranger
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - cellranger=8.0
+  - python=3.8
+  - samtools
+  - hdf5
+  - numpy

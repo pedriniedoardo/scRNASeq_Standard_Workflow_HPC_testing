@@ -1,0 +1,3 @@
+sample_name,sample_run,sample_path
+connect_5k_pbmc_NGSC3_ch1_gex_1,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/sample_pbmcs/connect_5k_pbmc_NGSC3_ch1_fastqs_tiny/run01/connect_5k_pbmc_NGSC3_ch1_gex_1_tiny
+connect_5k_pbmc_NGSC3_ch1_gex_2,run01,/idle/ric.cosr/ric.cosr/pedrini.edoardo/sample_data/sample_pbmcs/connect_5k_pbmc_NGSC3_ch1_fastqs_tiny/run01/connect_5k_pbmc_NGSC3_ch1_gex_2_tiny

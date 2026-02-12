@@ -1,0 +1,75 @@
+# Instructions here: https://snakemake.readthedocs.io/en/stable/executing/cli.html
+executor: slurm
+jobs: 30
+conda-prefix: .snakemake/conda
+rerun-incomplete: true
+keep-going: true
+latency-wait: 60
+cores: 72
+
+conda-base-path: /opt/common/tools/ric.cosr/miniconda3
+# conda-base-path: /home/pedrini.edoardo/miniconda3
+
+# No wall time information given. This might or might not work on your cluster. If not, specify the resource runtime in your rule or as a reasonable default via --default-resources.
+# TBD
+#
+default-resources:
+    slurm_account: "ric.cosr"
+    mem_mb: 5000
+    cores: 1
+
+set-threads:
+    runCellranger: 8 # To be decided
+    runCellrangerMultiRun: 8
+    pureExon: 16
+    pureExonMultiRun: 16
+    pureIntron: 16
+    pureIntronMultiRun: 16
+    pureAll: 16
+    pureAllMultiRun: 16
+    runSamplePreprocessing: 4
+    runAggregateQC: 4
+    runApplyQC: 4
+    cellranger_mkref: 16
+    integrateSamples: 8
+    runCellbender: 8
+    runVelocyto: 8
+    runVelocytoTest: 8
+
+set-resources:
+    runCellranger: 
+        mem_mb: 64000 # To be decided
+        mem_gb: 64
+    runCellrangerMultiRun: 
+        mem_mb: 64000 # To be decided
+        mem_gb: 64
+    pureExon: 
+        mem_mb: 64000 # To be decided
+    pureExonMultiRun: 
+        mem_mb: 64000 # To be decided
+    pureIntron: 
+        mem_mb: 64000 # To be decided
+    pureIntronMultiRun: 
+        mem_mb: 64000 # To be decided
+    pureAll: 
+        mem_mb: 64000 # To be decided
+    pureAllMultiRun: 
+        mem_mb: 64000 # To be decided
+    runSamplePreprocessing: 
+        mem_mb: 32000 # To be decided
+        mem_gb: 32
+    runAggregateQC: 
+        mem_mb: 8000 # To be decided
+        mem_gb: 8
+    runApplyQC: 
+        mem_mb: 32000 # To be decided
+        mem_gb: 32
+    cellranger_mkref:
+        mem_mb: 96000 # To be decided
+        mem_gb: 96
+    runCellbender:
+        mem_mb: 8000
+    runVelocyto:
+        mem_mb: 32000
+    runVelocytoTest:
+        mem_mb: 32000
