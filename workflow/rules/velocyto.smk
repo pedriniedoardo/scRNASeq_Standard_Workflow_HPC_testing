@@ -12,9 +12,14 @@ rule runVelocyto:
         config["env_velocyto"]
     log:
         "logs/velocyto/{sample_name}.log"
+    threads:
+        config["set-threads"]["runVelocyto"]
+    resources:
+        # Starts at base memory, doubles or adds for each retry
+        mem_mb = lambda wildcards, attempt: config["set-resources"]["runVelocyto"]["base_mb"] * attempt
     params:
-        cpus = config["set-threads"]["runVelocyto"],
-        RAM = config["set-resources"]["runVelocyto"]["mem_mb"]
+        # FIX: Check if mem_mb is an integer (real run) or a TBDString (dry run)
+        mem_thread = lambda wildcards, resources, threads: int((resources.mem_mb - 2000) / threads) if isinstance(resources.mem_mb, int) else 2000
     shadow: 
         # use shallow to make visible the whole snakemake root
         # use minimal to make visible only the specified inputs
@@ -25,8 +30,8 @@ rule runVelocyto:
         
         velocyto run10x \
         -m {input.mask_gtf} \
-        --samtools-threads {params.cpus} \
-        --samtools-memory {params.RAM} \
+        --samtools-threads {threads} \
+        --samtools-memory {params.mem_thread} \
         {input.cellranger_folder} \
         {input.transcriptome_gtf} \
         >> {log} 2>&1

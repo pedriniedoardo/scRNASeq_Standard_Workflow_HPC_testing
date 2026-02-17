@@ -14,7 +14,7 @@ rule runVelocytoTest:
         "logs/velocyto/connect_5k_pbmc_NGSC3_ch1_gex_1.log"
     params:
         cpus = config["set-threads"]["runVelocyto"],
-        RAM = config["set-resources"]["runVelocyto"]["mem_mb"]
+        # RAM = config["set-resources"]["runVelocyto"]["mem_mb"]
     shell:
         '''
         echo "Starting velocyto..." > {log}
