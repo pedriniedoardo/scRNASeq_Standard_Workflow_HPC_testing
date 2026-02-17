@@ -1,57 +1,43 @@
-# ======================================================================
-# == load libraries ==
-# ======================================================================
+# AIM ---------------------------------------------------------------------
+# test the integration approach without any filtering for the genes
 
-suppressPackageStartupMessages({
-  library(scater)
-  library(Seurat)
-  library(tidyverse)
-  library(robustbase)
-  library(patchwork)
-  library(scDblFinder)
-  library(presto)
-  library(harmony)
-})
+# renv integration --------------------------------------------------------
+# to load the packages
+# source(".Rprofile")
 
-# ======================================================================
-# == custom functions ==
-# ======================================================================
+# libraries ---------------------------------------------------------------
+library(scater)
+library(Seurat)
+library(tidyverse)
+library(robustbase)
+library(patchwork)
+library(scDblFinder)
+library(presto)
+library(harmony)
+
+# Snakemake integation ----------------------------------------------------
+# define the inputs
+
+# define the input spatial file
+# rds <- c("out/object/test_human_default/connect_5k_pbmc_NGSC3_ch1_gex_listTest.rds")
+rds <- snakemake@input$spe_input
+message("input spe object: ", rds)
+
+# define the output file
+# out_object <- "out/object/test_human_default/connect_5k_pbmc_NGSC3_ch1_gex_all.rds"
+out_object <- snakemake@output$spe_output
+message("output object: ", out_object)
 
 # specify the version of Seurat Assay -------------------------------------
 # set seurat compatible with seurat4 workflow
 options(Seurat.object.assay.version = "v5")
 
-# ======================================================================
-# == parameters ==
-# ======================================================================
-
+# parameters --------------------------------------------------------------
 n_dims = 30
 resolutions = c(.3, .6, 1, 1.2)
 min_pct = 0.1
 
-# ======================================================================
-# == Snakemake integation ==
-# ======================================================================
-
-# read in the rds file
-# rds <- snakemake@input$rds
-rds <- c("out/object/test_human_default/connect_5k_pbmc_NGSC3_ch1_gex_listTest.rds")
-out_object <- "out/object/test_human_default/connect_5k_pbmc_NGSC3_ch1_gex_all.rds"
-
-# define the output
-# out_object <- snakemake@output$rds
-# out_meta <- snakemake@output$meta
-# out_markers <- snakemake@output$markers
-
-message("input rds:"); cat(rds, sep = '\n')
-# message("output rds: ", out_object)
-# message("output meta: ", out_meta)
-# message("output markers: ", out_markers)
-
-# ======================================================================
-# == load and rename the barcodes ==
-# ======================================================================
-
+# load the data -----------------------------------------------------------
 # load objects 
 all_objects <- readRDS(rds)
 
@@ -75,15 +61,13 @@ lapply(all_objects, function(obj) {
   return(obj)
 }) -> all_objects
 
-# ======================================================================
-# == merge and pre-process ==
-# ======================================================================
 
-n_cells = sum(sapply(all_objects,ncol))
+# merge and processing ----------------------------------------------------
+n_cells <- sum(sapply(all_objects,ncol))
 options(future.globals.maxSize = length(all_objects) * n_cells*.1 * 1024^2)
 
 # merge
-merged = merge(all_objects[[1]], all_objects[-1])
+merged <- merge(all_objects[[1]], all_objects[-1])
 
 # standard pre-processing
 # (-defaults- arguments exposed)
@@ -137,10 +121,7 @@ merged <- merged %>%
     seed.use = 42
   )
 
-# ======================================================================
-# == integrate via Harmony ==
-# ======================================================================
-
+# integration -------------------------------------------------------------
 integrated = IntegrateLayers(
   merged, 
   method = HarmonyIntegration,
@@ -165,10 +146,7 @@ integrated = IntegrateLayers(
   verbose = TRUE
 )
 
-# ======================================================================
-# == embed and cluster ==
-# ======================================================================
-
+# embedding and clustering ------------------------------------------------
 integrated <- integrated %>% 
   FindNeighbors(
     reduction = "harmony", # SdP: cannot be changed
@@ -244,14 +222,8 @@ integrated <- integrated %>%
     verbose = TRUE
   )
 
-# ======================================================================
-# == join the layers of the merged object ==
-# ======================================================================
+# join layers -------------------------------------------------------------
+integrated <- JoinLayers(integrated)
 
-integrated = JoinLayers(integrated)
-
-# ======================================================================
-# == save output ==
-# ======================================================================
-
+# save output -------------------------------------------------------------
 saveRDS(integrated,out_object)

@@ -35,10 +35,8 @@ min_pct = 0.1
 
 # read in the rds file
 # rds <- snakemake@input$rds
-rds <- c("data/sample_obj/pbmc_test/connect_5k_pbmc_NGSC3_ch1_gex_1_default_obj_postQC.rds",
-         "data/sample_obj/pbmc_test/connect_5k_pbmc_NGSC3_ch1_gex_2_default_obj_postQC.rds")
-
-out_object <- "out/object/pbmc_test/connect_5k_pbmc_harmony_filter.rds"
+rds <- c("out/object/test_human_default/connect_5k_pbmc_NGSC3_ch1_gex_listTest.rds")
+out_object <- "out/object/test_human_default/connect_5k_pbmc_NGSC3_ch1_gex_filter.rds"
 
 # define the output
 # out_object <- snakemake@output$rds
@@ -55,7 +53,7 @@ message("input rds:"); cat(rds, sep = '\n')
 # ======================================================================
 
 # load objects 
-all_objects = lapply(rds, readRDS)
+all_objects = readRDS(rds)
 
 # rename cells (to avoid duplicated barcodes)
 # fix the metadata to avoid confusion with resolutions names
@@ -86,7 +84,6 @@ options(future.globals.maxSize = length(all_objects) * n_cells*.1 * 1024^2)
 
 # merge
 merged_full = merge(all_objects[[1]], all_objects[-1])
-
 
 # -------------------------------------------------------------------------
 # apply the gene filtering after merging

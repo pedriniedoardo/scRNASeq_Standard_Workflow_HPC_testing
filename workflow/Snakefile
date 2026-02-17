@@ -83,6 +83,7 @@ include: "rules/velocyto.smk"
 include: "rules/velocyto_test.smk"
 include: "rules/seurat_preprocess.smk"
 include: "rules/cellranger_mkref.smk"
+include: "rules/test_integration.smk"
 
 # ======================================================================
 # == pipeline main rules (calling for the outputs) ==
@@ -253,3 +254,34 @@ rule seurat_analysis:
         # --- Conditional Velocity input ---
         expand(rules.runVelocyto.output.loom, sample_name=SAMPLES_merge.keys()) 
         if config.get("run_velocity", False) else []
+
+# ======================================================================
+# == test benchmark ==
+# ======================================================================
+
+rule benchmark_seurat_filter:
+    '''
+    rule to run the benchmark test.
+    '''
+    input:
+        expand(rules.runTestSeuratCompare.output.plot_umap,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"]),
+        expand(rules.runTestSeuratCompare.output.plot_jaccard,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"]),
+        expand(rules.runTestSeuratCompare.output.plot_prop_hvg,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"]),
+        expand(rules.runTestSeuratCompare.output.tab_markers_all,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"]),
+        expand(rules.runTestSeuratCompare.output.tab_markers_filt,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"]),
+        expand(rules.runTestSeuratCompare.output.plot_upset,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"]),
+        expand(rules.runTestSeuratCompare.output.plot_exp,
+               sample_benchmark=config["sample_benchmark"],
+               res=config["resolutions"])

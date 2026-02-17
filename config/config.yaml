@@ -14,7 +14,8 @@ metadata: "metadata/metadata.tsv"
 # samples_csv: "config/samplesTestFast02.csv"
 
 # test multirun
-samples_csv: "config/samplesTestFast02_tinyTest_singlerun.csv"
+# samples_csv: "config/samplesTestFast02_tinyTest_singlerun.csv"
+samples_csv: "config/samplesTest03_human.csv"
 # samples_csv: "config/samplesTest03_mouse.csv"
 # samples_csv: "config/samplesTestFast02_tinyTest.csv"
 
@@ -45,29 +46,52 @@ run_cellbender: True
 # run_cellbender: False
 
 # add flag to run velocity or not. Set to False to skip velocity
-run_velocity: True
-# run_velocity: False
+# run_velocity: True
+run_velocity: False
 
 ref:
   # Ensembl species name
   species: homo_sapiens
+  # species: mus_musculus
   # Gencode release (make sure to take one where snpeff data is available, check 'snpEff databases' output)
   release: 45
   # Genome build
   build: GRCh38
   database: gencode
   organism_id: 9606
+  # organism_id: 10090
   animal: human
   # Path to the reference genome for Cell Ranger (e.g., GRCh38 or mm10)
   # test tiny
   # reference: "/idle/ric.cosr/ric.cosr/pedrini.edoardo/reference/cellranger_tiny_ref"
-  reference: "/beegfs/datasets/buffer/ric.cosr/cellranger/GRCh38_2024-A/GRCh38"
+  # reference: "/beegfs/datasets/buffer/ric.cosr/cellranger/GRCh38_2024-A/GRCh38"
   repeat_mask_gtf: "/idle/ric.cosr/ric.cosr/pedrini.edoardo/reference/repeat_mask_GRCh38.gtf"
   # reference: "/idle/ric.cosr/ric.cosr/pedrini.edoardo/reference/refdata-gex-GRCm39-2024-A"
-  # reference: "/idle/ric.cosr/ric.cosr/pedrini.edoardo/reference/refdata-gex-GRCh38-2024-A"
+  reference: "/idle/ric.cosr/ric.cosr/pedrini.edoardo/reference/refdata-gex-GRCh38-2024-A"
   reference_gtf: "/beegfs/scratch/ric.cosr/ric.brendolan/BrendolanA_2629_scRNAseq_Only_Seq/GRCm39_2024-A/GRCm39/genes/genes.gtf"
   reference_fasta: "/beegfs/scratch/ric.cosr/ric.brendolan/BrendolanA_2629_scRNAseq_Only_Seq/GRCm39_2024-A/GRCm39/fasta/genome.fa"
 trans: 
   # reference: "/beegfs/datasets/buffer/ric.cosr/cellranger_genomes/refdata-gex-mm10-2020-A"
   transgene_fasta: "/beegfs/scratch/ric.cosr/ric.brendolan/BrendolanA_2629_scRNAseq_Only_Seq/TdTomato.upper.fa"
   transgene_name: "TdTomato"
+
+# ======================================================================
+# == test benchmark ==
+# ======================================================================
+
+# benchmark locations
+location_benchmark_obj: "workflow/test/R_code/out/object/test_human_default/"
+location_benchmark_plot: "workflow/test/R_code/out/plot/test_human_default/"
+location_benchmark_table: "workflow/test/R_code/out/table/test_human_default/"
+
+# resolutions to be tested
+resolutions: ["RNA_snn_res.0.3"]
+
+# hardcode the sample name for the integration benchmark test
+sample_benchmark:
+  - 'connect_5k_pbmc_NGSC3_ch1_gex'
+  - '5k_Human_Donor1_PBMC_3p_gem-x_GEX'
+  - '5k_human_jejunum_CNIK_3pv3'
+  - 'Brain_Tumor_3p'
+  - 'Breast_Cancer_3p'
+  - 'SC3_v3_NextGem_DI_CRISPR_A549_5K_gex'

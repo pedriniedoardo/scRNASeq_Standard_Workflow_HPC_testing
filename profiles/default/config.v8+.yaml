@@ -6,6 +6,7 @@ rerun-incomplete: true
 keep-going: true
 latency-wait: 60
 cores: 72
+retries: 3 # set the number of attempts in case of a failed run (this is used to increase the resources with attempts)
 
 conda-base-path: /opt/common/tools/ric.cosr/miniconda3
 # conda-base-path: /home/pedrini.edoardo/miniconda3
@@ -35,6 +36,9 @@ set-threads:
     runCellbender: 8
     runVelocyto: 8
     runVelocytoTest: 8
+    runTestSeuratFilter: 4
+    runTestSeuratAll: 4
+    runTestSeuratCompare: 4
 
 set-resources:
     runCellranger: 
@@ -70,6 +74,10 @@ set-resources:
     runCellbender:
         mem_mb: 8000
     runVelocyto:
-        mem_mb: 32000
-    runVelocytoTest:
-        mem_mb: 32000
+        base_mb: 64000
+    runTestSeuratFilter:
+        mem_mb: 16000
+    runTestSeuratAll:
+        mem_mb: 16000
+    runTestSeuratCompare:
+        mem_mb: 16000
