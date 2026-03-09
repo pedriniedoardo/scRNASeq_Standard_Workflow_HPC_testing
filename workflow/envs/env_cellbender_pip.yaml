@@ -9,3 +9,4 @@ dependencies:
   - pip=24.0
   - pip:
       - cellbender==0.3.0
+      - lxml_html_clean==0.4.3

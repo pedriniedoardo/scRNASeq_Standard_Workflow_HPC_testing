@@ -9,7 +9,8 @@ rule runCellbender:
         filter_h5 = config["out_location"] + "cellbender/merged/{sample_name}/cellbender_out_filtered.h5",
         summary_plots = config["out_location"] + "cellbender/merged/{sample_name}/cellbender_out.pdf",
         barcodes = config["out_location"] + "cellbender/merged/{sample_name}/cellbender_out_cell_barcodes.csv",
-        metrics = config["out_location"] + "cellbender/merged/{sample_name}/cellbender_out_metrics.csv"
+        metrics = config["out_location"] + "cellbender/merged/{sample_name}/cellbender_out_metrics.csv",
+        html = config["out_location"] + "cellbender/merged/{sample_name}/cellbender_out_report.html"
     resources:
         slurm_partition="cuda",
         slurm_extra="--gres=gpu:1"
