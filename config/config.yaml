@@ -28,6 +28,7 @@ env_velocyto: "../envs/env_velocyto.yaml"
 # env_bioinfo: "/home/pedrini.edoardo/miniconda3/envs/env_bioinfo_minimal"
 env_bioinfo: "../envs/env_bioinfo_minimal.yaml"
 env_seurat: "../envs/env_R_COSR.yaml"
+env_testR: "../envs/env_testR.yaml"
 
 # were to save the output of the processing
 out_location: "results/"

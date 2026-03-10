@@ -84,6 +84,7 @@ include: "rules/velocyto_test.smk"
 include: "rules/seurat_preprocess.smk"
 include: "rules/cellranger_mkref.smk"
 include: "rules/test_integration.smk"
+include: "rules/test.smk"
 
 # ======================================================================
 # == pipeline main rules (calling for the outputs) ==
