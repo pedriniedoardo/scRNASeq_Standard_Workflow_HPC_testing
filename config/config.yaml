@@ -57,8 +57,6 @@ meta_annotation: "config/meta_annotation.json"
 # token for the annotation step
 # token_CyteTypeR: ""
 # now this has been set as an environment variable
-envvars:
-        "CYTETYPER_TOKEN"
 
 # covariate used in the annotation step
 cov_markers_CyteTypeR: "RNA_snn_res.0.3"

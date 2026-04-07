@@ -158,6 +158,10 @@ rule integrateSamples:
         "../scripts/03_integrate.R"
 
 
+# token for teh authentication
+envvars:
+        "CYTETYPER_TOKEN"
+
 rule AnnotationCyteTypeR:
     '''
     This rule run the automatic annotation using CyteTypeR
