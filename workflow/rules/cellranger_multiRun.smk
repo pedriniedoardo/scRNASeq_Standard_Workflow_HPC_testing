@@ -35,7 +35,7 @@ rule runCellrangerMultiRun:
         
         echo "start cellranger run for <{wildcards.sample_name}>" >> {log}
 
-        cellranger count --id={wildcards.sample_name} \
+        cellranger10 count --id={wildcards.sample_name} \
         --transcriptome={input.transcriptome} \
         --fastqs={params.fastqs} \
         --sample={wildcards.sample_name} \

@@ -46,7 +46,7 @@ rule cellranger_mkref:
         awk '$1 !~ /^#/' {params.transgene_gtf} >> {params.combined_gtf}
 
         echo "Running cellranger mkref..." >> {log}
-        cellranger mkref \
+        cellranger10 mkref \
             --genome={params.genome_name} \
             --fasta={params.combined_fa} \
             --genes={params.combined_gtf} \

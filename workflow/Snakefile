@@ -251,6 +251,9 @@ rule seurat_analysis:
         rules.integrateSamples.output.rds,
         rules.integrateSamples.output.meta,
         rules.integrateSamples.output.markers,
+
+        # add the annotation routine
+        rules.AnnotationCyteTypeR.output.rds,
         
         # --- Conditional Velocity input ---
         expand(rules.runVelocyto.output.loom, sample_name=SAMPLES_merge.keys()) 

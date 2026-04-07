@@ -1,0 +1,18 @@
+name: env_testR
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.4.3
+  - r-seurat=5.3.1
+  - r-presto=1.0.0
+  - r-essentials=4.4
+  - bioconductor-rhdf5=2.50.0
+  - bioconductor-rhdf5filters=1.18.0
+  - r-remotes=2.5.0
+  - r-logger=0.4.1
+  - r-httr2=1.2.2
+  - r-duckdb=1.5.1
+
+# in the header of the main script run the installation of the packages from GitHub
+# remotes::install_github("NygenAnalytics/CyteTypeR", ref = "v0.4.2", upgrade = "never")

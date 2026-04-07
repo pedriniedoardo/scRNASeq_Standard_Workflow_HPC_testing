@@ -14,8 +14,8 @@ metadata: "metadata/metadata.tsv"
 # samples_csv: "config/samplesTestFast02.csv"
 
 # test multirun
-# samples_csv: "config/samplesTestFast02_tinyTest_singlerun.csv"
-samples_csv: "config/samplesTest03_human.csv"
+samples_csv: "config/samplesTestFast02_tinyTest_singlerun.csv"
+# samples_csv: "config/samplesTest03_human.csv"
 # samples_csv: "config/samplesTest03_mouse.csv"
 # samples_csv: "config/samplesTestFast02_tinyTest.csv"
 
@@ -29,6 +29,7 @@ env_velocyto: "../envs/env_velocyto.yaml"
 env_bioinfo: "../envs/env_bioinfo_minimal.yaml"
 env_seurat: "../envs/env_R_COSR.yaml"
 env_testR: "../envs/env_testR.yaml"
+env_annotationCyteTypeR: "../envs/env_cytetypeR.yaml"
 
 # were to save the output of the processing
 out_location: "results/"
@@ -49,6 +50,18 @@ run_cellbender: True
 # add flag to run velocity or not. Set to False to skip velocity
 # run_velocity: True
 run_velocity: False
+
+# json containing the metadata for the annotation step
+meta_annotation: "config/meta_annotation.json"
+
+# token for the annotation step
+# token_CyteTypeR: ""
+# now this has been set as an environment variable
+envvars:
+        "CYTETYPER_TOKEN"
+
+# covariate used in the annotation step
+cov_markers_CyteTypeR: "RNA_snn_res.0.3"
 
 ref:
   # Ensembl species name

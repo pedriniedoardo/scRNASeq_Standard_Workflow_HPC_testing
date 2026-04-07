@@ -1,0 +1,13 @@
+name: 
+  env_cytetype
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.14
+  - pip=26.0
+  - ipykernel=7.2.0
+  - scanpy=1.12
+  - pip:
+      - cytetype==0.2.0

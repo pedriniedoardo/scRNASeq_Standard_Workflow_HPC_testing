@@ -149,10 +149,43 @@ rule integrateSamples:
             sum(sum(1 for line in open(f)) for f in input.meta_tables) * config["memory_per_cell"]
         ) if all(os.path.exists(f) for f in input.meta_tables) else config["max_mem_mb"]
     log:
-        'logs/Seurat/integrated/runApplyQC.log'
+        'logs/Seurat/integrated/integrateSamples.log'
     benchmark:
         'benchmarks/Seurat/integrated/integrateSamples.txt'
     params:
         # id_org = config["ref"]["organism_id"]
     script:
         "../scripts/03_integrate.R"
+
+
+rule AnnotationCyteTypeR:
+    '''
+    This rule run the automatic annotation using CyteTypeR
+    '''
+    input:
+        rds = rules.integrateSamples.output.rds,
+        markers = rules.integrateSamples.output.markers,
+        metadata = config["meta_annotation"],
+        meta_tables = expand(rules.runApplyQC.output.meta,
+        sample_name=SAMPLES_merge.keys())
+    output:
+        rds = config["out_location"] + "Seurat/object/integrated_obj_" + CELLBENDER_TAG + "_CyteTypeR.rds",
+        vars_h5_path = config["out_location"] + "Seurat/object/vars_" + CELLBENDER_TAG + ".h5",
+        obs_duckdb_path = config["out_location"] + "Seurat/object/obs_" + CELLBENDER_TAG + ".duckdb",
+        query_filename = config["out_location"] + "Seurat/object/query_" + CELLBENDER_TAG + ".json"
+    conda: config["env_annotationCyteTypeR"]
+    resources:
+        mem_mb = lambda wildcards, input: min(
+            config["max_mem_mb"],
+            sum(sum(1 for line in open(f)) for f in input.meta_tables) * config["memory_per_cell"]
+        ) if all(os.path.exists(f) for f in input.meta_tables) else config["max_mem_mb"]
+    log:
+        'logs/Seurat/integrated/AnnotationCyteTypeR.log'
+    benchmark:
+        'benchmarks/Seurat/integrated/AnnotationCyteTypeR.txt'
+    params:
+        # id_org = config["ref"]["organism_id"]
+        # token = config["token_CyteTypeR"],
+        cov_markers = config["cov_markers_CyteTypeR"]
+    script:
+        "../scripts/04_annotation_CyteTypeR.R"
