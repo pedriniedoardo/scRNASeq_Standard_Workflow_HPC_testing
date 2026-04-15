@@ -44,8 +44,8 @@ memory_per_cell: 1        # MB per cell
 max_mem_mb: 300000        # MB
 
 # add flag to run cellbender or not. Set to False to skip cellbender
-run_cellbender: True
-# run_cellbender: False
+# run_cellbender: True
+run_cellbender: False
 
 # add flag to run velocity or not. Set to False to skip velocity
 # run_velocity: True
@@ -60,6 +60,17 @@ meta_annotation: "config/meta_annotation.json"
 
 # covariate used in the annotation step
 cov_markers_CyteTypeR: "RNA_snn_res.0.3"
+
+Seurat:
+  embedding:
+    n_dims: 30
+    resolutions: [.3, .6, 1, 1.2]
+  markers: 
+    min_pct: .1
+    
+report:
+  figure_extension: ['pdf', 'png']
+  qc_features: ['nFeature_RNA','nCount_RNA','percent.mt','percent.ribo','percent.globin','scDblFinder.score']
 
 ref:
   # Ensembl species name

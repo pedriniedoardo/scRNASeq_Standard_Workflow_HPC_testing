@@ -75,6 +75,7 @@ set-resources:
         mem_gb: 96
     runCellbender:
         mem_mb: 8000
+        gpu: 1
     runVelocyto:
         base_mb: 64000
     runTestSeuratFilter:

@@ -139,9 +139,10 @@ rule integrateSamples:
         meta_tables = expand(rules.runApplyQC.output.meta,
         sample_name=SAMPLES_merge.keys())
     output:
-        rds = config["out_location"] + "Seurat/object/integrated_obj_" + CELLBENDER_TAG + ".rds",
-        meta = config["out_location"] + "Seurat/table/integrated_meta_" + CELLBENDER_TAG + ".tsv",
-        markers = config["out_location"] + "Seurat/table/integrated_markers_" + CELLBENDER_TAG + ".tsv",
+        merged_rds     = config["out_location"] + "Seurat/object/merged_obj_" + CELLBENDER_TAG + ".rds",
+        integrated_rds = config["out_location"] + "Seurat/object/integrated_obj_" + CELLBENDER_TAG + ".rds",
+        meta           = config["out_location"] + "Seurat/table/integrated_meta_" + CELLBENDER_TAG + ".tsv",
+        markers        = config["out_location"] + "Seurat/table/integrated_markers_" + CELLBENDER_TAG + ".tsv",
     conda: config["env_seurat"]
     resources:
         mem_mb = lambda wildcards, input: min(
@@ -149,7 +150,7 @@ rule integrateSamples:
             sum(sum(1 for line in open(f)) for f in input.meta_tables) * config["memory_per_cell"]
         ) if all(os.path.exists(f) for f in input.meta_tables) else config["max_mem_mb"]
     log:
-        'logs/Seurat/integrated/integrateSamples.log'
+        'logs/Seurat/integrated/runApplyQC.log'
     benchmark:
         'benchmarks/Seurat/integrated/integrateSamples.txt'
     params:
@@ -157,8 +158,7 @@ rule integrateSamples:
     script:
         "../scripts/03_integrate.R"
 
-
-# token for teh authentication
+# token for the annotation step is defined as environment variable
 envvars:
         "CYTETYPER_TOKEN"
 
@@ -167,7 +167,7 @@ rule AnnotationCyteTypeR:
     This rule run the automatic annotation using CyteTypeR
     '''
     input:
-        rds = rules.integrateSamples.output.rds,
+        rds = rules.integrateSamples.output.integrated_rds,
         markers = rules.integrateSamples.output.markers,
         metadata = config["meta_annotation"],
         meta_tables = expand(rules.runApplyQC.output.meta,

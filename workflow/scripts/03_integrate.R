@@ -37,12 +37,14 @@ min_pct = 0.1
 rds <- snakemake@input$rds
 
 # define the output
-out_object <- snakemake@output$rds
-out_meta <- snakemake@output$meta
-out_markers <- snakemake@output$markers
+out_merged_object     <- snakemake@output$merged_rds
+out_integrated_object <- snakemake@output$integrated_rds
+out_meta              <- snakemake@output$meta
+out_markers           <- snakemake@output$markers
 
 message("input rds:"); cat(rds, sep = '\n')
-message("output rds: ", out_object)
+message("output merged rds: ", out_merged_object)
+message("output integrated rds: ", out_integrated_object)
 message("output meta: ", out_meta)
 message("output markers: ", out_markers)
 
@@ -130,35 +132,114 @@ merged <- merged %>%
     reduction.name = "pca",
     reduction.key = "PC_",
     seed.use = 42
+  ) %>% 
+  FindNeighbors(
+    reduction = "pca", # SdP: cannot be changed
+    dims = 1:n_dims, 
+    assay = NULL,
+    features = NULL, # Features to use as input for building the (S)NN; used only when dims is NULL
+    k.param = 20, # Defines k for the k-nearest neighbor algorithm (SdP: change to make it compliant with RunUMAP)
+    return.neighbor = FALSE,
+    # compute.SNN = !return.neighbor,
+    prune.SNN = 1/15, # Sets the cutoff for acceptable Jaccard index when computing the neighborhood overlap for the SNN construction. Any edges with values less than or equal to this will be set to 0 and removed from the SNN graph
+    nn.method = "annoy", # Method for nearest neighbor finding. Options include: rann, annoy
+    n.trees = 50, # More trees gives higher precision when using annoy approximate nearest neighbor search
+    annoy.metric = "euclidean", # Distance metric for annoy. Options include: euclidean, cosine, manhattan, and hamming
+    nn.eps = 0, # Error bound when performing nearest neighbor seach using RANN; default of 0.0 implies exact nearest neighbor search
+    verbose = TRUE,
+    do.plot = FALSE,
+    graph.name = NULL, # Default is assay.name_(s)nn
+    l2.norm = FALSE, # Take L2Norm of the data
+    cache.index = FALSE
+  ) %>% 
+  RunUMAP(
+    dims = 1:n_dims, 
+    reduction = "pca", # SdP: cannot be changed
+    features = NULL, # dims must be NULL to run on features
+    graph = NULL, # Name of graph on which to run UMAP
+    assay = DefaultAssay(object = object),
+    nn.name = NULL, # Name of knn output on which to run UMAP
+    slot = "data",
+    umap.method = "uwot",
+    reduction.model = NULL, # DimReduc object that contains the umap model
+    return.model = FALSE,
+    n.neighbors = 30L, # SdP: same as in FindNeighbors?
+    n.components = 2L,
+    metric = "cosine",
+    n.epochs = NULL,
+    learning.rate = 1,
+    min.dist = 0.3,
+    spread = 1,
+    set.op.mix.ratio = 1,
+    local.connectivity = 1L,
+    repulsion.strength = 1,
+    negative.sample.rate = 5L,
+    a = NULL,
+    b = NULL,
+    uwot.sgd = FALSE,
+    seed.use = 42L,
+    metric.kwds = NULL,
+    angular.rp.forest = FALSE,
+    densmap = FALSE,
+    dens.lambda = 2,
+    dens.frac = 0.3,
+    dens.var.shift = 0.1,
+    verbose = TRUE,
+    reduction.name = "umap",
+    reduction.key = NULL
+  ) %>% 
+  FindClusters(
+    graph.name = NULL,
+    cluster.name = NULL,
+    modularity.fxn = 1,
+    initial.membership = NULL,
+    node.sizes = NULL,
+    resolution = resolutions, # SdP: multiple resolutions?
+    # argument is now depracated
+    # method = "matrix",
+    algorithm = 1,
+    n.start = 10,
+    n.iter = 10,
+    random.seed = 0,
+    group.singletons = TRUE,
+    temp.file.location = NULL,
+    edge.file.name = NULL,
+    verbose = TRUE
   )
   
 # ======================================================================
 # == integrate via Harmony ==
 # ======================================================================
 
-integrated = IntegrateLayers(
-  merged, 
-  method = HarmonyIntegration,
-  orig.reduction = "pca",
-  assay = NULL,
-  features = NULL, # Ignored
-  scale.layer = "scale.data", # Ignored
-  new.reduction = "harmony",
-  layers = NULL, # Ignored
-  npcs = 50L,
-  key = "harmony_",
-  theta = NULL, # Diversity clustering penalty parameter
-  lambda = NULL, # Ridge regression penalty parameter
-  sigma = 0.1, # Width of soft kmeans clusters
-  nclust = NULL, # Number of clusters in model
-  tau = 0, # Protection against overclustering small datasets with large ones
-  block.size = 0.05, # What proportion of cells to update during clustering
-  max.iter.harmony = 10L, # Maximum number of rounds to run Harmony
-  max.iter.cluster = 20L, # Maximum number of rounds to run clustering at each round of Harmony
-  epsilon.cluster = 1e-05, # Convergence tolerance for clustering round of Harmony
-  epsilon.harmony = 1e-04, # Convergence tolerance for Harmony
-  verbose = TRUE
-)
+if( length(all_objects)>1 ) # need integration
+{
+  integrated = IntegrateLayers(
+    merged, 
+    method = HarmonyIntegration,
+    orig.reduction = "pca",
+    assay = NULL,
+    features = NULL, # Ignored
+    scale.layer = "scale.data", # Ignored
+    new.reduction = "harmony",
+    layers = NULL, # Ignored
+    npcs = 50L,
+    key = "harmony_",
+    theta = NULL, # Diversity clustering penalty parameter
+    lambda = NULL, # Ridge regression penalty parameter
+    sigma = 0.1, # Width of soft kmeans clusters
+    nclust = NULL, # Number of clusters in model
+    tau = 0, # Protection against overclustering small datasets with large ones
+    block.size = 0.05, # What proportion of cells to update during clustering
+    max.iter.harmony = 10L, # Maximum number of rounds to run Harmony
+    max.iter.cluster = 20L, # Maximum number of rounds to run clustering at each round of Harmony
+    epsilon.cluster = 1e-05, # Convergence tolerance for clustering round of Harmony
+    epsilon.harmony = 1e-04, # Convergence tolerance for Harmony
+    verbose = TRUE
+  )
+} else { # no-need for integration
+  integrated = merged
+  integrated@reductions$harmony = integrated@reductions$pca
+}
 
 # ======================================================================
 # == embed and cluster ==
@@ -243,6 +324,7 @@ integrated <- integrated %>%
 # == join the layers of the merged object ==
 # ======================================================================
 
+merged     = JoinLayers(merged)
 integrated = JoinLayers(integrated)
 
 # ======================================================================
@@ -286,6 +368,8 @@ integrated.markers = do.call('rbind', integrated.markers)
 # == save output ==
 # ======================================================================
 
-saveRDS(integrated,out_object)
-write_tsv(integrated@meta.data %>% rownames_to_column("barcodes"),out_meta)
+saveRDS(merged, out_merged_object)
+saveRDS(integrated, out_integrated_object)
+write_tsv(integrated@meta.data %>% 
+            rownames_to_column("barcodes"), out_meta)
 write_tsv(integrated.markers, out_markers)

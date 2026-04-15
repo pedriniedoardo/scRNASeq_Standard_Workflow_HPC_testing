@@ -78,13 +78,9 @@ include: "rules/cellranger_process.smk"
 include: "rules/cellranger_multiRun.smk"
 include: "rules/cellranger_multiRun_IntronExon.smk"
 include: "rules/cellbender.smk"
-include: "rules/cellbender_test.smk"
-include: "rules/velocyto.smk"
-include: "rules/velocyto_test.smk"
 include: "rules/seurat_preprocess.smk"
 include: "rules/cellranger_mkref.smk"
-include: "rules/test_integration.smk"
-include: "rules/test.smk"
+include: "rules/report_images.smk"
 
 # ======================================================================
 # == pipeline main rules (calling for the outputs) ==
@@ -150,11 +146,7 @@ rule cellranger_multirun_default:
         expand(rules.moveCellrangerSummaryMultiRun.output.summary,
                 sample_name=SAMPLES_merge.keys()),
 
-        expand(rules.runMultiqc1MultiRun.output.html),
-        
-        # --- Conditional Velocity input ---
-        expand(rules.runVelocyto.output.loom, sample_name=SAMPLES_merge.keys()) 
-        if config.get("run_velocity", False) else []
+        expand(rules.runMultiqc1MultiRun.output.html)
 
 
 # default rule to run cellranger with IntronExon split outputs
@@ -179,6 +171,7 @@ rule multirun_pure_IntronExon:
         expand(rules.runMultiqc1MultiRun.output.html)
 
 # --- test cellbender module ---
+# rule to run only cellbender on all the samples
 rule run_cellbender:
     '''
     rule to test the run of cellbender alone
@@ -187,18 +180,9 @@ rule run_cellbender:
         expand(rules.runCellbender.output.full_h5,
                 sample_name=SAMPLES_merge.keys())
 
-# --- test velocyto module ---
-rule run_velocyto:
-    '''
-    rule to test the run of velocyto alone
-    '''
-    input:
-        expand(rules.runVelocyto.output.loom,
-                sample_name=SAMPLES_merge.keys())
-
 
 # --- Seurat preoprocessing ---
-# default rule to run the cellranger pipeline. this is a stopping point for the workflow.
+# default rule to run the cellranger pipeline. this is a stopping point for the workflow. fill the LUT with QC parameters before proceeding further
 rule seurat_preprocessing:
     '''
     rule to run the preprocessing of the individual samples using Seurat.
@@ -213,29 +197,10 @@ rule seurat_preprocessing:
         rules.runAggregateQC.output.plot_mito,
         rules.runAggregateQC.output.plot_feature,
         rules.runAggregateQC.output.LUT_QC,
-        rules.runAggregateQC.output.meta_total,
-        
-        # --- Conditional Velocity input ---
-        expand(rules.runVelocyto.output.loom, sample_name=SAMPLES_merge.keys()) 
-        if config.get("run_velocity", False) else []
+        rules.runAggregateQC.output.meta_total
 
 # --- Seurat analysis ---
-#
-# rule seurat_analysis:
-#     '''
-#     rule to run the seurat analysis.
-#     '''
-#     input:
-#         ######################################################
-#         # added as last rule, but not needed
-#         expand(rules.moveCellrangerSummaryMultiRun.output.summary,
-#                 sample_name=SAMPLES_merge.keys()),
-#         expand(rules.runMultiqc1MultiRun.output.html),
-#         ######################################################
-
-#         expand(rules.runApplyQC.output.rds,sample_name=SAMPLES_merge.keys()),
-#         expand(rules.runApplyQC.output.meta,sample_name=SAMPLES_merge.keys())
-
+# rule to run the whole pipeline up to the integration with default parameters
 rule seurat_analysis:
     '''
     rule to run the seurat analysis.
@@ -248,44 +213,10 @@ rule seurat_analysis:
         expand(rules.runMultiqc1MultiRun.output.html),
         ######################################################
 
-        rules.integrateSamples.output.rds,
+        rules.integrateSamples.output.merged_rds,
+        rules.integrateSamples.output.integrated_rds,
         rules.integrateSamples.output.meta,
         rules.integrateSamples.output.markers,
 
         # add the annotation routine
-        rules.AnnotationCyteTypeR.output.rds,
-        
-        # --- Conditional Velocity input ---
-        expand(rules.runVelocyto.output.loom, sample_name=SAMPLES_merge.keys()) 
-        if config.get("run_velocity", False) else []
-
-# ======================================================================
-# == test benchmark ==
-# ======================================================================
-
-rule benchmark_seurat_filter:
-    '''
-    rule to run the benchmark test.
-    '''
-    input:
-        expand(rules.runTestSeuratCompare.output.plot_umap,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"]),
-        expand(rules.runTestSeuratCompare.output.plot_jaccard,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"]),
-        expand(rules.runTestSeuratCompare.output.plot_prop_hvg,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"]),
-        expand(rules.runTestSeuratCompare.output.tab_markers_all,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"]),
-        expand(rules.runTestSeuratCompare.output.tab_markers_filt,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"]),
-        expand(rules.runTestSeuratCompare.output.plot_upset,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"]),
-        expand(rules.runTestSeuratCompare.output.plot_exp,
-               sample_benchmark=config["sample_benchmark"],
-               res=config["resolutions"])
+        rules.AnnotationCyteTypeR.output.rds
