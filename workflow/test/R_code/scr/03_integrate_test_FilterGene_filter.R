@@ -80,7 +80,10 @@ lapply(all_objects, function(obj) {
 # ======================================================================
 
 n_cells = sum(sapply(all_objects,ncol))
-options(future.globals.maxSize = length(all_objects) * n_cells*.1 * 1024^2)
+
+# Ensures the limit is either your calculated size or 1GB, whichever is larger
+dynamic_size <- length(all_objects) * n_cells * 0.1 * 1024^2
+options(future.globals.maxSize = max(dynamic_size, 1024^3))
 
 # merge
 merged_full = merge(all_objects[[1]], all_objects[-1])
