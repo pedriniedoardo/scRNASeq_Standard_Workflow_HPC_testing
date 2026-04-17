@@ -77,7 +77,22 @@ lapply(all_objects, function(obj) {
 # ======================================================================
 
 n_cells = sum(sapply(all_objects,ncol))
-options(future.globals.maxSize = length(all_objects) * n_cells*.1 * 1024^2)
+
+# Ensures the limit is either your calculated size or 1GB, whichever is larger
+dynamic_size <- length(all_objects) * n_cells * 0.1 * 1024^2
+options(future.globals.maxSize = max(dynamic_size, 1024^3))
+
+
+# test filtering low expressed genes --------------------------------------
+# # merge
+# merged_full = merge(all_objects[[1]], all_objects[-1])
+
+# # apply the gene filtering after merging
+# # manual implementation
+# counts <- GetAssayData(JoinLayers(merged_full[["RNA"]]), assay = "RNA", layer = "counts")
+# genes_to_keep <- rowSums(counts > 0) >= 20
+# merged <- merged_full[genes_to_keep, ]
+# -------------------------------------------------------------------------
 
 # merge
 merged = merge(all_objects[[1]], all_objects[-1])
@@ -326,6 +341,29 @@ integrated <- integrated %>%
 
 merged     = JoinLayers(merged)
 integrated = JoinLayers(integrated)
+
+# remove stale layers -----------------------------------------------------
+
+# format(object.size(integrated), units = "GB")
+# format(object.size(merged), units = "GB")
+
+# remove stale layers of scale.data
+stale_layers <- grep("^scale\\.data\\.", Layers(integrated), value = TRUE)
+for (lyr in stale_layers) {
+  LayerData(integrated, assay = "RNA", layer = lyr) <- NULL
+}
+
+# same for merged if needed
+stale_layers <- grep("^scale\\.data\\.", Layers(merged), value = TRUE)
+for (lyr in stale_layers) {
+  LayerData(merged, assay = "RNA", layer = lyr) <- NULL
+}
+
+# format(object.size(integrated), units = "GB")
+# format(object.size(merged), units = "GB")
+
+# -------------------------------------------------------------------------
+
 
 # ======================================================================
 # == markers ==
