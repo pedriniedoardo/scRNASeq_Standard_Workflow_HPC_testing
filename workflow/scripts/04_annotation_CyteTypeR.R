@@ -8,7 +8,11 @@
 # Bootstrap CyteTypeR
 if (!requireNamespace("CyteTypeR", quietly = TRUE)) {
   message("Installing CyteTypeR from GitHub...")
-  remotes::install_github("NygenAnalytics/CyteTypeR", ref = "v0.4.2", upgrade = "never")
+  # fix the version
+  # remotes::install_github("NygenAnalytics/CyteTypeR", ref = "v0.4.2", upgrade = "never")
+  
+  # lates version
+  remotes::install_github("NygenAnalytics/CyteTypeR", upgrade = "never")
 }
 
 library(CyteTypeR)
