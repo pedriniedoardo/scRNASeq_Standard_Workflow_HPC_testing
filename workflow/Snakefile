@@ -219,4 +219,10 @@ rule seurat_analysis:
         rules.integrateSamples.output.markers,
 
         # add the annotation routine
-        rules.AnnotationCyteTypeR.output.rds
+        rules.AnnotationCyteTypeR.output.rds,
+
+        # report images
+        rules.reportImages.output.vln_qc,
+        rules.reportImages.output.dim_qc,
+        rules.reportImages.output.dim_ident,
+        rules.reportImages.output.dim_clusters

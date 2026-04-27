@@ -41,6 +41,7 @@ set-threads:
     runTestSeuratCompare: 4
     testAnnotationCyteTypeR: 8
     AnnotationCyteTypeR: 8
+    reportImages: 8
 
 set-resources:
     runCellranger: 
@@ -87,3 +88,5 @@ set-resources:
     testAnnotationCyteTypeR: 
         mem_mb: 32000 # To be decided
         mem_gb: 32
+    reportImages:
+        mem_mb: 64000 # To be decided

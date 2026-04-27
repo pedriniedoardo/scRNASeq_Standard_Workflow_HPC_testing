@@ -7,30 +7,32 @@ rule reportImages:
     integrated_rds = rules.integrateSamples.output.integrated_rds
   output:
     vln_qc = expand(
-        config["out_location"] + "Seurat/plot/vln_{feature}.{extension}",
+        config["out_location"] + "Seurat/plot/vln_{feature}_" + CELLBENDER_TAG + ".{extension}",
         feature   = config["report"]["qc_features"],
         extension = config["report"]["figure_extension"]
     ),
     dim_qc = expand(
-        config["out_location"] + "Seurat/plot/dim_{feature}.{extension}",
+        config["out_location"] + "Seurat/plot/dim_{feature}_" + CELLBENDER_TAG + ".{extension}",
         feature   = config["report"]["qc_features"],
         extension = config["report"]["figure_extension"]
     ),
     dim_ident = expand(
-      config["out_location"] + "Seurat/plot/dim_{object_type}_ident.{extension}",
+      config["out_location"] + "Seurat/plot/dim_{object_type}_ident_" + CELLBENDER_TAG + ".{extension}",
       object_type = ["merged", "integrated"],
       extension   = config["report"]["figure_extension"]
       ),
     dim_clusters = expand(
-      config["out_location"] + "Seurat/plot/dim_{object_type}_cluster.{extension}",
+      config["out_location"] + "Seurat/plot/dim_{object_type}_cluster_" + CELLBENDER_TAG + ".{extension}",
       object_type = ["merged", "integrated"],
+      resolution  = config["Seurat"]["embedding"]["resolutions"],
       extension   = config["report"]["figure_extension"]
       )
   params:
     out_location     = config["out_location"],
     qc_features      = config["report"]["qc_features"],
     figure_extension = config["report"]["figure_extension"],
-    resolutions      = config["Seurat"]["embedding"]["resolutions"]
+    resolutions      = config["Seurat"]["embedding"]["resolutions"],
+    cellbender_tag   = CELLBENDER_TAG
   conda: config["env_seurat"]
   log:
       'logs/report/reportImages.log'
@@ -38,5 +40,3 @@ rule reportImages:
       'benchmarks/report/reportImages.txt'
   script:
       "../scripts/05_report_images.R"
-
-    

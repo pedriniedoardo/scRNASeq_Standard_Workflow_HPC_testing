@@ -44,8 +44,8 @@ memory_per_cell: 1        # MB per cell
 max_mem_mb: 300000        # MB
 
 # add flag to run cellbender or not. Set to False to skip cellbender
-# run_cellbender: True
-run_cellbender: False
+run_cellbender: True
+# run_cellbender: False
 
 # add flag to run velocity or not. Set to False to skip velocity
 # run_velocity: True
