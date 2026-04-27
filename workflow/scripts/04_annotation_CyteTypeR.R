@@ -108,12 +108,122 @@ prepped_data <- PrepareCyteTypeR(obj = scobj,
                                  obs_duckdb_path = out_id_duckdb)
 
 # run the annotation
-results <- CyteTypeR(obj = scobj,
-                     auth_token = token,
-                     prepped_data = prepped_data, 
-                     study_context = list_metadata$study_context, 
-                     metadata = list_metadata,
-                     query_filename = out_id_filename)
+# results <- CyteTypeR(obj = scobj,
+#                      auth_token = token,
+#                      prepped_data = prepped_data, 
+#                      study_context = list_metadata$study_context, 
+#                      metadata = list_metadata,
+#                      query_filename = out_id_filename)
+
+# --- new implementation to recover output data ---
+results  <- NULL
+
+# handle the console output to collect the job_id generated
+msg_log <- tempfile()
+msg_con <- file(msg_log, open = "wt")
+sink(msg_con, type = "message")
+
+# run the CyteTypeR
+results <- tryCatch(
+  {
+    message("Submitting query to CyteTypeR server...")
+    CyteTypeR(obj = scobj,
+              auth_token = token,
+              prepped_data = prepped_data,
+              study_context = list_metadata$study_context,
+              metadata = list_metadata,
+              query_filename = out_id_filename)
+  },
+  error = function(e) {
+    message("CyteTypeR failed: ", conditionMessage(e))
+    NULL
+  },
+  finally = {
+    sink(type = "message")
+    close(msg_con)
+  }
+)
+
+# replay captured log so it is printed in the console
+logged <- readLines(msg_log)
+cat(paste(logged, collapse = "\n"), "\n")
+
+# extract job_id from captured output
+all_log <- paste(logged, collapse = " ")
+job_id <- regmatches(
+  all_log,
+  regexpr("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", all_log)
+)
+if (length(job_id) == 0) job_id <- NULL
+
+# if the run has failed because of a dropped connection, pull the meta_resutls
+meta_results <- NULL
+if (is.null(results)) {
+  if (is.null(job_id)) {
+    stop("CyteTypeR failed before a job_id was obtained. Cannot retrieve results.")
+  }
+  # Reconstruct job details in scobj@misc so GetResults uses the same pipeline as CyteTypeR (normalize + correct endpoint), instead of the bare job_id path.
+  scobj@misc[["cytetype_jobDetails"]] <- list(
+    job_id = job_id,
+    api_url = "https://prod.cytetype.nygen.io",
+    group_key = cov_markers,
+    cluster_labels = prepped_data$clusterLabels
+  )
+  message("Retrieving results via GetResults (job_id: ", job_id, ")...")
+  meta_results <- GetResults(obj = scobj,
+                             auth_token = token,
+                             results_prefix = "cytetype")
+}
+
+# testing
+# test <- GetResults(obj = scobj,
+#                    auth_token = token,
+#                    results_prefix = "cytetype")
+#
+# test2 <- GetResults(auth_token = token,
+#                     results_prefix = "cytetype",
+#                     job_id = job_id)
+# test3 <- CyteTypeR:::.transform_results_seurat(
+#   meta_results,
+#   cluster_map = prepped_data$clusterLabels)
+
+# GetResults returns the normalized result list, not an annotated Seurat object.
+# Transform and apply annotations to scobj to mirror what CyteTypeR does internally. cluster_map handles the sequential ID -> original label translation internally.
+if (!is.null(meta_results)) {
+  transformed_results <- CyteTypeR:::.transform_results_seurat(
+    meta_results,
+    cluster_map = prepped_data$clusterLabels
+  )
+
+  # add the main annotations from the collected results
+  ann_colname <- paste("cytetype", "annotation",cov_markers, sep = "_")
+  onto_colname <- paste("cytetype", "cellOntologyTerm", cov_markers, sep = "_")
+  ontoID_colname <- paste("cytetype", "cellOntologyTermID", cov_markers, sep = "_")
+  state_colname <- paste("cytetype", "cellState", cov_markers, sep = "_")
+  # this is missing from the regular run of CyteTypeR output
+  granular_colname <- paste("cytetype", "granularAnnotation", cov_markers, sep = "_")
+
+  cells_group <- as.character(scobj@meta.data[[cov_markers]])
+  scobj@meta.data[[ann_colname]] <- factor(setNames(transformed_results$annotation, transformed_results$clusterId)[cells_group])
+  scobj@meta.data[[onto_colname]] <- factor(setNames(transformed_results$ontologyTerm, transformed_results$clusterId)[cells_group])
+  scobj@meta.data[[ontoID_colname]] <- factor(setNames(transformed_results$ontologyTermID, transformed_results$clusterId)[cells_group])
+  scobj@meta.data[[state_colname]] <- factor(setNames(transformed_results$cellState, transformed_results$clusterId)[cells_group])
+  # this is missing from the regular run of CyteTypeR output
+  scobj@meta.data[[granular_colname]] <- factor(setNames(transformed_results$granularAnnotation, transformed_results$clusterId)[cells_group])
+
+  # for some reason in the default run of CyteTypeR there are also some other covariates added to the metadata but are redundant
+  # cytetype_RNA_snn_res.x -> annoation
+  # cytetype_ontologyTerm_RNA_snn_res.x -> cellOntologyTerm
+  # cytetype_ontologyID_RNA_snn_res.x -> cellOntologyTermID
+
+  # I have deceded to skip them
+
+  scobj@misc$cytetype_results <- transformed_results
+
+  results <- scobj
+}
+
+# table(results@meta.data$RNA_snn_res.0.5,results@meta.data$cytetype_cellState_RNA_snn_res.0.5)
 
 # ======================================================================
 # == save output ==
