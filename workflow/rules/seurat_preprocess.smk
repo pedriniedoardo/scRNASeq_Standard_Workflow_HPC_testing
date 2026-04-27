@@ -188,6 +188,7 @@ rule AnnotationCyteTypeR:
     benchmark:
         'benchmarks/Seurat/integrated/AnnotationCyteTypeR.txt'
     params:
+        cellbender_tag   = CELLBENDER_TAG,
         # id_org = config["ref"]["organism_id"]
         # token = config["token_CyteTypeR"],
         cov_markers = config["cov_markers_CyteTypeR"]

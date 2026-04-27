@@ -27,6 +27,7 @@ library(duckdb)
 rds <- snakemake@input$rds
 markers <- snakemake@input$markers
 metadata <- snakemake@input$metadata
+cellbender_tag <- snakemake@params$cellbender_tag
 
 # rds <- "../../../results/Seurat/object/integrated_obj_cellbender.rds"
 # markers <- "../../../results/Seurat/table/integrated_markers_cellbender.tsv"
@@ -34,6 +35,7 @@ metadata <- snakemake@input$metadata
 
 message("input rds: ", rds)
 message("input metadata: ", metadata)
+message("cellbender tag: ", cellbender_tag)
 
 # output:
 out_id_rds <- snakemake@output$rds
@@ -76,6 +78,9 @@ df_markers <- read_tsv(markers)
 
 # read in the metadata
 list_metadata <- yaml::read_yaml(metadata)
+
+# modify the title to incorporate the cellbender tag
+list_metadata$title <- paste(list_metadata$title,cellbender_tag,sep = "_")
 
 # ======================================================================
 # == run the standard processing ==
